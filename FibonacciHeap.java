@@ -13,7 +13,7 @@ public class FibonacciHeap {
 	private int numTrees;
 	private int totalLinks;
 	private int totalCuts;
-	public int maxRank;
+	private int maxRank;
 
 	/**
 	 *
