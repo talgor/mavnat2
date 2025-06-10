@@ -13,7 +13,7 @@ public class FibonacciHeap {
 	private int numTrees;
 	private int totalLinks;
 	private int totalCuts;
-	private int maxRank;
+	public int maxRank;
 
 	/**
 	 *
@@ -292,7 +292,9 @@ public class FibonacciHeap {
 	 *
 	 */
 	public int delete(HeapNode x) {
-		decreaseKey(x, Integer.MAX_VALUE);
+		// We need x.key < min.key, so the diff needs to be greater than the difference
+		// between x.key and the current minimum
+		decreaseKey(x, x.key - this.min.key + 1);
 		deleteMin();
 		return totalLinks;
 	}
@@ -321,23 +323,25 @@ public class FibonacciHeap {
 	 *
 	 */
 	public void meld(FibonacciHeap heap2) {
-		if (heap2 == null || heap2.min == null)
+		if (heap2 == null)
 			return;
-		if (this.min == null) {
-			this.min = heap2.min;
-		} else {
-			// Merge the circular doubly linked lists
-			HeapNode thisNext = this.min.next;
-			HeapNode otherNext = heap2.min.next;
-
-			this.min.next = otherNext;
-			otherNext.prev = this.min;
-
-			heap2.min.next = thisNext;
-			thisNext.prev = heap2.min;
-
-			if (heap2.min.key < this.min.key) {
+		if (heap2.min != null) {
+			if (this.min == null) {
 				this.min = heap2.min;
+			} else {
+				// Merge the circular doubly linked lists
+				HeapNode thisNext = this.min.next;
+				HeapNode otherNext = heap2.min.next;
+
+				this.min.next = otherNext;
+				otherNext.prev = this.min;
+
+				heap2.min.next = thisNext;
+				thisNext.prev = heap2.min;
+
+				if (heap2.min.key < this.min.key) {
+					this.min = heap2.min;
+				}
 			}
 		}
 		this.maxRank = Math.max(this.maxRank, heap2.maxRank);
@@ -345,6 +349,14 @@ public class FibonacciHeap {
 		this.numTrees += heap2.numTrees;
 		this.totalLinks += heap2.totalLinks;
 		this.totalCuts += heap2.totalCuts;
+
+		//Clear heap2's state after meld ---
+		heap2.min = null;
+		heap2.size = 0;
+		heap2.numTrees = 0;
+		heap2.totalLinks = 0;
+		heap2.totalCuts = 0;
+		heap2.maxRank = 0; // Reset maxRank for the now-empty heap
 	}
 
 	/**
