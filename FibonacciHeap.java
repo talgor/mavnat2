@@ -239,18 +239,19 @@ public class FibonacciHeap {
 		x.key -= diff;
 		HeapNode parent = x.parent;
 
+		int cuts = 0; // Initialize a local counter for cuts
 		if (parent != null && x.key < parent.key) {
-			cut(x, parent);
+			cuts += cut(x, parent);
 			cascadingCut(parent);
 		}
 		if (x.key < this.min.key) {
 			this.min = x;
 		}
 
-		return totalCuts;
+		return cuts;
 	}
 
-	private void cut(HeapNode x, HeapNode y) {
+	private int cut(HeapNode x, HeapNode y) {
 		if (x.next == x) {
 			y.child = null;
 		} else {
@@ -271,18 +272,21 @@ public class FibonacciHeap {
 
 		numTrees++;
 		totalCuts++;
+		return 1;
 	}
 
-	private void cascadingCut(HeapNode y) {
+	private int cascadingCut(HeapNode y) {
 		HeapNode z = y.parent;
+		int cuts = 0; // Local cuts for this cascading operation
 		if (z != null) {
 			if (y.mark < this.c) {
 				y.mark++;
 			} else {
-				cut(y, z);
-				cascadingCut(z);
+				cuts += cut(y, z);
+				cuts += cascadingCut(z);
 			}
 		}
+		return cuts;
 	}
 
 	/**
@@ -294,7 +298,7 @@ public class FibonacciHeap {
 	public int delete(HeapNode x) {
 		// We need x.key < min.key, so the diff needs to be greater than the difference
 		// between x.key and the current minimum
-		decreaseKey(x, x.key - this.min.key + 1);
+		decreaseKey(x, Integer.MAX_VALUE);
 		deleteMin();
 		return totalLinks;
 	}
@@ -350,7 +354,7 @@ public class FibonacciHeap {
 		this.totalLinks += heap2.totalLinks;
 		this.totalCuts += heap2.totalCuts;
 
-		//Clear heap2's state after meld ---
+		//Clear heap2's state after meld
 		heap2.min = null;
 		heap2.size = 0;
 		heap2.numTrees = 0;
