@@ -279,7 +279,7 @@ public class FibonacciHeap {
 		HeapNode z = y.parent;
 		int cuts = 0; // Local cuts for this cascading operation
 		if (z != null) {
-			if (y.mark < this.c) {
+			if (y.mark < this.c - 1) {
 				y.mark++;
 			} else {
 				cuts += cut(y, z);
